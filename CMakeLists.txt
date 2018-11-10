@@ -268,6 +268,7 @@ target_link_libraries(
     dmlc::dmlc
     HalideIR::HalideIR
     dlpack::dlpack
+    tvm
 )
 
 # Tests
