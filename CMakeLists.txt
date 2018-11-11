@@ -218,9 +218,9 @@ add_library(nnvm_compiler SHARED ${NNVM_COMPILER_SRCS})
 
 if(NOT BUILD_NNVM_ONLY)
 
-target_link_libraries(tvm ${TVM_LINKER_LIBS} ${TVM_RUNTIME_LINKER_LIBS})
+target_link_libraries(tvm PUBLIC ${TVM_LINKER_LIBS} ${TVM_RUNTIME_LINKER_LIBS})
 target_link_libraries(tvm_topi PUBLIC tvm ${TVM_LINKER_LIBS} ${TVM_RUNTIME_LINKER_LIBS})
-target_link_libraries(tvm_runtime ${TVM_RUNTIME_LINKER_LIBS})
+target_link_libraries(tvm_runtime PUBLIC ${TVM_RUNTIME_LINKER_LIBS})
 
 # Related headers
 target_include_directories(
