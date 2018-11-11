@@ -59,8 +59,10 @@ tvm_option(USE_RANDOM "Build with random support" OFF)
 
 # include directories
 include_directories("include")
-include_directories("3rdparty/dlpack/include")
-include_directories("3rdparty/dmlc-core/include")
+if(NOT HUNTER_ENABLED)
+  include_directories("3rdparty/dlpack/include")
+  include_directories("3rdparty/dmlc-core/include")
+endif()
 include_directories("3rdparty/compiler-rt")
 
 # initial variables
@@ -97,9 +99,17 @@ else(MSVC)
 endif(MSVC)
 
 # add source group
-FILE(GLOB_RECURSE GROUP_SOURCE "src/*.cc" "3rdparty/HalideIR/src/*.cpp" "nnvm/src/*.cc")
-FILE(GLOB_RECURSE GROUP_INCLUDE "src/*.h" "include/*.h" "3rdparty/HalideIR/src/*.h"
-                                "nnvm/src/*.h" "nnvm/include/*.h")
+FILE(GLOB_RECURSE GROUP_SOURCE "src/*.cc" "nnvm/src/*.cc")
+FILE(GLOB_RECURSE GROUP_INCLUDE "src/*.h" "include/*.h" "nnvm/src/*.h" "nnvm/include/*.h")
+
+if(NOT HUNTER_ENABLED)
+  FILE(GLOB_RECURSE GROUP_SOURCE_ "3rdparty/HalideIR/src/*.cpp")
+  FILE(GLOB_RECURSE GROUP_INCLUDE_ "3rdparty/HalideIR/src/*.h")
+
+  LIST(APPEND GROUP_SOURCE ${GROUP_SOURCE_})
+  LIST(APPEND GROUP_INCLUDE ${GROUP_INCLUDE_})
+endif()
+
 assign_source_group("Source" ${GROUP_SOURCE})
 assign_source_group("Include" ${GROUP_INCLUDE})
 
@@ -131,24 +141,26 @@ if(BUILD_NNVM_REDUCED)
       nnvm/src/c_api/*.cc
       nnvm/src/core/*.cc
       nnvm/src/pass/*.cc
-      )
+  )
 else()
-
-file(GLOB_RECURSE NNVM_COMPILER_SRCS
+  file(GLOB_RECURSE NNVM_COMPILER_SRCS
     nnvm/src/c_api/*.cc
     nnvm/src/core/*.cc
     nnvm/src/pass/*.cc
     nnvm/src/compiler/*.cc
     nnvm/src/top/*.cc
-    )
-
+  )
 endif()
 
 file(GLOB TOPI_SRCS
     topi/src/*.cc
 )
-file(GLOB_RECURSE HALIDEIR_SRCS 3rdparty/HalideIR/src/*.cpp)
-list(APPEND COMPILER_SRCS ${HALIDEIR_SRCS})
+
+if(NOT HUNTER_ENABLED)
+  file(GLOB_RECURSE HALIDEIR_SRCS 3rdparty/HalideIR/src/*.cpp)
+  list(APPEND COMPILER_SRCS ${HALIDEIR_SRCS})
+endif()
+
 file(GLOB RUNTIME_SRCS src/runtime/*.cc)
 
 # Package runtime rules
@@ -183,7 +195,7 @@ if(USE_GRAPH_RUNTIME)
     list(APPEND RUNTIME_SRCS ${RUNTIME_GRAPH_DEBUG_SRCS})
     set_source_files_properties(${RUNTIME_GRAPH_SRCS}
       PROPERTIES COMPILE_DEFINITIONS "TVM_GRAPH_RUNTIME_DEBUG")
-  endif(USE_GRAPH_RUNTIME_DEBUG)
+  endif(USE_GRAPH_RUNTIME_DEBUG)e
 endif(USE_GRAPH_RUNTIME)
 
 # Module rules
@@ -225,8 +237,15 @@ target_link_libraries(tvm_runtime PUBLIC ${TVM_RUNTIME_LINKER_LIBS})
 # Related headers
 target_include_directories(
   tvm
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/3rdparty/HalideIR/src>"
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/topi/include>")
+
+if(NOT HUNTER_ENABLED)
+  target_include_directories(
+    tvm
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/3rdparty/HalideIR/src>"
+  )
+endif()
+
 target_include_directories(
   tvm_topi
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/topi/include>")
