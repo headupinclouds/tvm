@@ -141,6 +141,7 @@ if(BUILD_NNVM_REDUCED)
       nnvm/src/c_api/*.cc
       nnvm/src/core/*.cc
       nnvm/src/pass/*.cc
+      nnvm/src/compiler/*.cc # TEST
   )
 else()
   file(GLOB_RECURSE NNVM_COMPILER_SRCS
