@@ -63,8 +63,9 @@ The configuration of tvm can be modified by `config.cmake`.
   - Change ``set(USE_CUDA OFF)`` to ``set(USE_CUDA ON)`` to enable CUDA backend. So do other backends and libraries
     (OpenCL, RCOM, METAL, VULKAN, ...).
 
-- TVM optionally depends on LLVM. LLVM is required for CPU codegen that needs LLVM.
+- TVM optionally depends on LLVM. LLVM is required for CPU codegen that needs LLVM
 
+  - Note that ``cuda`` targets also have host side codegen requirements that require LLVM
   - LLVM 4.0 or higher is needed for build with LLVM. Note that verison of LLVM from default apt may lower than 4.0.
   - Since LLVM takes long time to build from source, you can download pre-built version of LLVM from
     [LLVM Download Page](http://releases.llvm.org/download.html).
